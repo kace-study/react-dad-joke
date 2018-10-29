@@ -36,11 +36,33 @@ class App extends Component {
     if (this.state.route === 'home' && !keyword) {
       // no route change
     } else if (this.state.keyword !== keyword) {
-      const filteredJokes = jokes.filter((data) => {
-        return data.joke.includes(keyword);
-      });
-      this.setState({ keyword: keyword, results: filteredJokes });
-      this.onRouteChange('search');
+
+      const param = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      };
+      fetch(`${process.env.REACT_APP_DEV_QUERY_API_URL}?query=${keyword}`, param)
+        .then(response => response.json())
+        .then(jokes => {
+          const filteredJokes = jokes.filter((data) => {
+            const jokeLowerCase = data.joke.toLowerCase();
+            return jokeLowerCase.includes(keyword.toLowerCase());
+        })
+        .map((data) => {
+          return   {
+            id: data.id,
+            joke: data.joke,
+            category: data.categoryName,
+            like: data.like,
+            username: data.userName
+          }
+        });
+          this.setState({ keyword: keyword, results: filteredJokes });
+          this.onRouteChange('search');
+        })
+        .catch(console.log);
     } 
   }
 
