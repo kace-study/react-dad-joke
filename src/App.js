@@ -1,24 +1,33 @@
 import React, { Component } from 'react';
-import { Container, Row, Col } from 'reactstrap';
+import { 
+  Container, 
+  Row, 
+  Col, 
+  Navbar,
+  NavbarBrand 
+} from 'reactstrap';
 
 // Custom Component
 import Navigation from './components/Navigation/Navigation';
 import SearchBox from './components/SearchBox/SearchBox';
+import SearchResult from './components/SearchResult/SearchResult';
 import JokeList from './components/JokeList/JokeList';
-import jokes from './seeds/jokes/jokes'
+import Home from './components/Home/Home';
+import jokes from './seeds/jokes/jokes';
 
 // CSS 
 import './App.css';
 
 const initialState = {
+  route: 'home',
   keyword: '',
   results: []
 }
 
 class App extends Component {
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = initialState;
   }
 
@@ -26,13 +35,20 @@ class App extends Component {
     this.setState({ results: jokes });
   }
 
-  // confirm react lifecycle again
-  // これはonChangeでやらない方良い。リクエスト数が半端なさそう。
-  onSearchChange = (event) =>  {
-    const filteredJokes = jokes.filter((data) => {
-      return data.joke.includes(event.target.value);
-    });
-    this.setState({ keyword: event.target.value, results: filteredJokes });
+  onRouteChange = (route) => {
+    this.setState({ route: route });
+  }
+
+  search = (keyword) => {
+    if (this.state.route === 'home' && !keyword) {
+      // no route change
+    } else if (this.state.keyword !== keyword) {
+      const filteredJokes = jokes.filter((data) => {
+        return data.joke.includes(keyword);
+      });
+      this.setState({ keyword: keyword, results: filteredJokes });
+      this.onRouteChange('search');
+    } 
   }
 
   getYear() {
@@ -40,60 +56,45 @@ class App extends Component {
   }
 
   render() {
-    const { keyword, results } = this.state;
+    const { route, keyword, results } = this.state;
 
     return (
-      <div className="app">
+        <div className="app">
 
-        <Navigation id="navigation"/>
+          <Navbar fixed="top" dark color="dark" expand="md">
+            <Container>
+              <NavbarBrand href="/">
+                  Dad's Joke
+              </NavbarBrand>
+            </Container>
+          </Navbar>
 
-        <section id="prologue-section" className="py-5 text-center">
-          <Container>
-            <Row>
-              <Col className="text-center">
-                <h1 className="pb-3 d-none d-md-block">おじさんはもっと面白くなれる</h1>
-                <h3 className="pb-2 d-md-none">おじさんは<br/>もっと面白くなれる</h3>
-                <p className="small">もっと面白くなりたいおじさんのためのサイトです。<br/>あなただけのオヤジギャクを見つけましょう。</p>
-              </Col>
-            </Row>
-          </Container>
-        </section>
+          { route === 'search' ? 
+            <SearchResult search={this.search} keyword={keyword} results={results} /> : 
+            <Home search={this.search} /> }
 
-        <section id="search-section" className="pb-4 text-center">
-          <Container>
-            <Row>
-              <Col md={{ size: 6, offset: 3 }}>
-                <SearchBox onSearchChange={this.onSearchChange}/>
-              </Col>
-            </Row>
-          </Container>
-        </section>
 
-        <hr />
+          {/* <section id="search-result-section" className="py-4">
+            <Container>
+              <Row>
+                <Col md={{ size: 8, offset: 2 }}>
+                  <h5>検索結果：{keyword} ヒット数：{results.length} </h5>
+                  <JokeList jokes={results} />
+                </Col>
+              </Row>
+            </Container>
+          </section> */}
 
-        <section id="search-result-section" className="py-4">
-          <Container>
-            <Row>
-              <Col md={{ size: 10, offset: 1 }}>
-                <h5>検索結果：{keyword} ヒット数：{results.length} </h5>
-                <JokeList jokes={results} />
-              </Col>
-            </Row>
-          </Container>
-        </section>
-
-        <section className="pt-5"></section>
-
-        <footer id="main-footer" className="py-4 bg-light">
-          <Container>
-            <Row>
-              <Col className="text-center">
-                <p>Dad Joke created by kace, Copyright &copy; {this.getYear()}</p>
-              </Col>
-            </Row>
-          </Container>
-        </footer>
-      </div>
+          <footer id="main-footer" className="pt-3 bg-light">
+            <Container>
+              <Row>
+                <Col className="text-center">
+                  <p className="small">Dad's Joke created by kace, Copyright &copy; {this.getYear()}</p>
+                </Col>
+              </Row>
+            </Container>
+          </footer>
+        </div>
     );
   }
 }

@@ -1,4 +1,6 @@
 import React from 'react';
+import './Navigation.css';
+
 import {
   Container,
   Navbar,
@@ -9,9 +11,11 @@ class Navigation extends React.Component {
   render() {
     return (
       <div>
-        <Navbar color="primary" dark expand="md">
+        <Navbar fixed="top" dark color="dark" expand="md">
           <Container>
-            <NavbarBrand href="/">Dad Joke</NavbarBrand>
+            <NavbarBrand href="/">
+              Dad's Joke
+            </NavbarBrand>
           </Container>
         </Navbar>
       </div>
