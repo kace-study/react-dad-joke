@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import './SearchBox.css';
 
 import {
@@ -14,19 +16,24 @@ class SearchBox extends React.Component {
     super(props);
     this.state = {
       input: this.props.keyword ? this.props.keyword : ''
-    }
+    } 
   }
 
-  onInputChange = (e) => {
-    this.setState({ input: e.target.value});
+  onChange = (event) => {
+    this.setState({ input: event.target.value});
   }
 
-  onButtonClick = () => {
+  onClick = () => {
     this.props.search(this.state.input);
   }
 
+  onKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      this.props.search(this.state.input);
+    }
+  }
+
   render() {
-    const { input } = this.state;
     return (
       <div className="search-box-container">
         <InputGroup>
@@ -34,18 +41,24 @@ class SearchBox extends React.Component {
             type="search" 
             name="search" 
             id="search" 
-            value={input}
+            value={this.state.input}
             placeholder="キーワードを入力"
-            onChange={this.onInputChange}
+            onChange={this.onChange}
+            onKeyPress={this.onKeyPress} 
             >
           </Input>
           <InputGroupAddon addonType="append">
-            <Button className="search-button" onClick={this.onButtonClick}>検索</Button>
+            <Button className="search-button" onClick={this.onClick}>検索</Button>
           </InputGroupAddon>
         </InputGroup>
       </div>
     );
   }
 }
+
+SearchBox.propTypes =  {
+  search:   PropTypes.func.isRequired,
+  keyword:  PropTypes.string.isRequired
+};
 
 export default SearchBox;
